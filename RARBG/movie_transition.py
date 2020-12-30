@@ -3,6 +3,7 @@ from pprint import pprint
 
 
 PTT = re.compile('(.+?)\.((?:19|20)\d\d)\.(.+)')
+PTT_YTS = re.compile('(.+?)\((\d\d\d\d)\)(.+)')
 
 ROMAN = re.compile('^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$')
 
@@ -39,9 +40,9 @@ def move_current_movies(new_path, old_path, movies_db, limit, exe=False):
         data['cmds'].setdefault(key, {})
         data['cmds'][key][sub_key] = []
         cmd = []
-        videos = glob.glob(os.path.join(d, '*.mp4'))
+        videos = glob.glob(os.path.join(glob.escape(d), '*.mp4'))
         if not videos:
-            videos = glob.glob(os.path.join(d, '*.mkv'))
+            videos = glob.glob(os.path.join(glob.escape(d), '*.mkv'))
         if not videos:
             data['skips'].setdefault(key, {})
             data['skips'][key][sub_key] = 'Empty directory'
@@ -49,13 +50,13 @@ def move_current_movies(new_path, old_path, movies_db, limit, exe=False):
 
         mp4_file = videos[0]
         mp4_name = os.path.splitext(os.path.basename(mp4_file))[0]
-        srts = glob.glob(os.path.join(d, '*.srt'))
+        srts = glob.glob(os.path.join(glob.escape(d), '*.srt'))
         movie_dir = os.path.join(old_path, key_to_name(key))
         
         if movies_db[key]['current'] and os.path.isdir(movies_db[key]['current']):
             if not os.path.isdir(movie_dir):
                 os.mkdir(movie_dir)
-            files = glob.glob(os.path.join(movies_db[key]['current'], '*'))
+            files = glob.glob(os.path.join(glob.escape(movies_db[key]['current']), '*'))
             for f in files:
                 data['cmds'][key][sub_key].append("Move: %s -> %s" % (f, movie_dir))
                 if exe:
@@ -68,7 +69,7 @@ def move_current_movies(new_path, old_path, movies_db, limit, exe=False):
 
     return data
 
-def move_new_movies(new_path, movies_db, limit, exe=False):
+def move_new_movies(new_path, movies_db, limit, exe=False, is_yts=False):
     data = {'cmds': {}, 'skips': {}}
     idx = 0
 
@@ -80,18 +81,25 @@ def move_new_movies(new_path, movies_db, limit, exe=False):
         # Gathering movies information
         dir_name = os.path.basename(d).lower()
         print("\n-------- Processing %s ---------" % dir_name)
-        m = PTT.match(dir_name)
-        name = m.group(1).lower()
-        quality = '2160p' if '2160p' in m.group(3) else '1080p'
-        codec = 'x265' if 'x265' in m.group(3) else 'h264'
+        if is_yts:
+            m = PTT_YTS.match(dir_name)
+            name = m.group(1).rstrip().replace(' ', '.')
+            quality = '2160p' if '2160' in m.group(3) else '1080p'
+            codec = 'x265'
+        else:
+            m = PTT.match(dir_name)
+            name = m.group(1).lower()
+            quality = '2160p' if '2160p' in m.group(3) else '1080p'
+            codec = 'x265' if 'x265' in m.group(3) else 'h264'
+        
         key = "%s.%s" % (name, m.group(2))
         sub_key = "%s_%s" % (quality, codec)
 
         data['cmds'].setdefault(key, {})
         cmd = []
-        videos = glob.glob(os.path.join(d, '*.mp4'))
+        videos = glob.glob(os.path.join(glob.escape(d), '*.mp4'))
         if not videos:
-            videos = glob.glob(os.path.join(d, '*.mkv'))
+            videos = glob.glob(os.path.join(glob.escape(d), '*.mkv'))
         if not videos:
             data['skips'].setdefault(key, {})
             data['skips'][key][sub_key] = 'Empty directory'
@@ -99,8 +107,8 @@ def move_new_movies(new_path, movies_db, limit, exe=False):
 
         mp4_file = videos[0]
         mp4_name = os.path.splitext(os.path.basename(mp4_file))[0]
-        srts = glob.glob(os.path.join(d, '*.srt'))
-        srts.extend(glob.glob(os.path.join(d, '*.ass')))
+        srts = glob.glob(os.path.join(glob.escape(d), '*.srt'))
+        srts.extend(glob.glob(os.path.join(glob.escape(d), '*.ass')))
 
         # Start moving files around
         # Move current files to old directory if it is available
@@ -131,6 +139,7 @@ if __name__ == '__main__':
     parser.add_argument('--exe', action='store_true', help='Execute or just show')
     parser.add_argument('--action', type=str, default='', choices=['', 'old', 'new'], help='Select type of action')
     parser.add_argument('--limit', type=int, default=0, help='How many dirs to execute')
+    parser.add_argument('--yts', action='store_true', help='Is movie YTS or not')
     args = parser.parse_args()
 
     with open(args.new_movies_db) as sin:
@@ -142,7 +151,7 @@ if __name__ == '__main__':
         output['old'] = data
 
     if args.action == 'new':
-        data = move_new_movies(args.new_path, movies_db['movies_db'], args.limit, args.exe)
+        data = move_new_movies(args.new_path, movies_db['movies_db'], args.limit, args.exe, args.yts)
         output['new'] = data
 
     if args.out:
