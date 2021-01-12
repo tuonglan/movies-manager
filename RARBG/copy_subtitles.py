@@ -60,13 +60,13 @@ def copy_subtitles(movies_db, exe=False):
                 srts.extend(glob.glob(os.path.join(glob.escape(current_m_d), '*.ass')))
                 for srt in srts:
                     ext = os.path.splitext(srt)[1]
-                    if 'vie.' in srt or '(Vietnamese)' in srt or '(Vie)' in srt:
+                    if ('vie.' in srt or '(Vietnamese)' in srt or '(Vie)' in srt) and not sub['Vietnamese']:
                         new_vie_sub_file = os.path.join(mov_path, "%s.vie%s" % (mp4_name, ext))
                         cmd.append("Vietnamese Sub: %s FROM %s" % (new_vie_sub_file, srt))
                         sub['Vietnamese'] = "%s (Current)" % new_vie_sub_file
                         if exe:
                            shutil.copyfile(srt, new_vie_sub_file)
-                    elif not sub['English'] and ('eng.' in srt or '(English)' in srt or len(srts) < 3):
+                    if ('eng.' in srt or '(English)' in srt or len(srts) < 3) and not sub['English']:
                         new_eng_sub_file = os.path.join(mov_path, "%s.eng%s" % (mp4_name, ext))
                         cmd.append("English Sub: %s FROM %s" % (new_eng_sub_file, srt))
                         sub['English'] = "%s (Current)" % new_eng_sub_file

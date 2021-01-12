@@ -48,6 +48,7 @@ def scan_recursive_file(fulltree, tree, err, stats, path):
     videos = glob.glob(os.path.join(glob.escape(path), '*.mp4'))
     videos.extend(glob.glob(os.path.join(glob.escape(path), '*.mkv')))
     videos.extend(glob.glob(os.path.join(glob.escape(path), '*.avi')))
+    videos.extend(glob.glob(os.path.join(glob.escape(path), '*.ts')))
     if not videos:
         sub_dirs = [d for d in glob.glob(os.path.join(path, '*')) if os.path.isdir(d)]
         for d in sub_dirs:
@@ -79,6 +80,7 @@ def scan_recursive_dir(fulltree, tree, err, stats, path):
     videos = glob.glob(os.path.join(glob.escape(path), '*.mp4'))
     videos.extend(glob.glob(os.path.join(glob.escape(path), '*.mkv')))
     videos.extend(glob.glob(os.path.join(glob.escape(path), '*.avi')))
+    videos.extend(glob.glob(os.path.join(glob.escape(path), '*.ts')))
     if not videos:
         sub_dirs = [d for d in glob.glob(os.path.join(path, '*')) if os.path.isdir(d)]
         for d in sub_dirs:

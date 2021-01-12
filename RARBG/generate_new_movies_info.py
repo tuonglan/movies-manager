@@ -6,14 +6,15 @@ PTT = re.compile('(.+?)\.((?:19|20)\d\d)\.(.+)')
 
 def scan_new_movies_dir(path):
     movies_db = {}
+    skips = {}
     for mov_path in glob.glob(os.path.join(glob.escape(path), '*')):
-        print("Scanniing %s" % mov_path)
+        print("Scanning %s" % mov_path)
         video_files = glob.glob(os.path.join(glob.escape(mov_path), '*.mp4'))
         if not video_files:
             video_files = glob.glob(os.path.join(glob.escape(mov_path), '*.mkv'))
         if not video_files:
             print("\tERROR: Can't find any video in %s" % os.path.basename(mov_path))
-            movies_db.setdefault('error', {})[mov_path] = []
+            skips[mov_path] = []
             continue
 
         gen = (f for f in video_files)
@@ -23,7 +24,7 @@ def scan_new_movies_dir(path):
                 m = PTT.match(video_filename)
                 if not m:
                     print("\tWARNING: Invalid file name: %s" % video_filename)
-                    movies_db.setdefault('error', {}).setdefault(mov_path, []).append(video_filename)
+                    skips.setdefault(mov_path, []).append(video_filename)
                     continue
 
                 name = m.group(1)
@@ -39,7 +40,7 @@ def scan_new_movies_dir(path):
             print("\tERROR: None valid video file found")
             continue
             
-    return movies_db
+    return movies_db, skips
 
 def generate_new_movies_db(path):
     movies_db = {}
@@ -93,8 +94,8 @@ if __name__ == '__main__':
     parser.add_argument('--out', type=str, default='', help='Output file')
     args = parser.parse_args()
 
-    movies_db = scan_new_movies_dir(args.path)
-    new_movies = {'movies_db': movies_db}
+    movies_db, skips = scan_new_movies_dir(args.path)
+    new_movies = {'movies_db': movies_db, 'skips': skips}
 
     # Read the current movies
     if args.current_movies:

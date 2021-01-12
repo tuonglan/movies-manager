@@ -28,12 +28,13 @@ def move_current_movies(movies_db, path, limit, exe=False):
                 break
             idx += 1
 
-            movie_dir = os.path.join(old_path, key_to_name(mov_name))
+            movie_dir = os.path.join(path, key_to_name(mov_name))
             
             if movies_db[mov_name]['current'] and os.path.isdir(movies_db[mov_name]['current']):
-                if not os.path.isdir(movie_dir):
+                if not os.path.isdir(movie_dir) and exe:
                     os.mkdir(movie_dir)
                 files = glob.glob(os.path.join(glob.escape(movies_db[mov_name]['current']), '*'))
+                data['cmds'].setdefault(mov_name, {}).setdefault(mov_quality, [])
                 for f in files:
                     data['cmds'][mov_name][mov_quality].append("Move: %s -> %s" % (f, movie_dir))
                     if exe:
@@ -71,11 +72,13 @@ def move_new_movies(movies_db, limit, exe=False):
 
             # Start moving files around
             # Move current files to old directory if it is available
-            if movies_db[mov_name]['current'] and os.path.isdir(movies_db[mov_name]['current']):
+            if movies_db[mov_name]['current']:
                 data['cmds'][mov_name][mov_quality] = ["Move: %s -> %s"  % (mp4_file, movies_db[mov_name]['current'])]
                 for srt in srts:
                     data['cmds'][mov_name][mov_quality].append("Move: %s -> %s" % (srt, movies_db[mov_name]['current']))
                 if exe:
+                    if not os.path.isdir(movies_db[mov_name]['current']):
+                        os.mkdir(movies_db[mov_name]['current'])
                     shutil.move(mp4_file, movies_db[mov_name]['current'])
                     for srt in srts:
                         shutil.move(srt, movies_db[mov_name]['current'])

@@ -19,14 +19,14 @@ def create_link(src, link):
 
 def remove_obs_dirs(obs_dirs):
     for d in obs_dirs:
-        links = glob.glob(os.path.join(d, '*'))
+        links = glob.glob(os.path.join(glob.escape(d), '*'))
         for l in links:
             os.unlink(l)
         os.rmdir(d)
 
 def generate_symlinks(movies, path, limit=0):
     idx = 0
-    current_dirs = set(glob.glob(os.path.join(path, '*')))
+    current_dirs = set(glob.glob(os.path.join(glob.escape(path), '*')))
     new_dirs = set()
     for key, movie in movies.items():
         if limit > 0 and idx >= limit:
@@ -40,7 +40,7 @@ def generate_symlinks(movies, path, limit=0):
             os.mkdir(movie_dir)
 
         # Generate the symbolinks
-        current_links = set(glob.glob(os.path.join(movie_dir, '*')))
+        current_links = set(glob.glob(os.path.join(glob.escape(movie_dir), '*')))
         new_links = set()
         for sub_key, video in movie['videos'].items():
             tag = sub_key

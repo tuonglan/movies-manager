@@ -7,8 +7,8 @@ PTT_FILE = re.compile('(.+?)((?:19|20)\d\d)(.*)')
 PTT_TEAM = re.compile('.*- ?(.+?)\..*')
 
 # Codec matcher
-H264 = re.compile('x264|h264')
-H265 = re.compile('x265|h265|hevc')
+H264 = re.compile('x264|h264|h\.264')
+H265 = re.compile('x265|h265|h\.265|hevc')
 XVID = re.compile('xvid')
 DIVX = re.compile('divx')
 
@@ -19,7 +19,7 @@ UHD = re.compile('2160p|uhd|4k')
 
 # Source matcher
 BLUERAY = re.compile('blu-ray|bluray|bdrip|brip|brrip|bdr')
-WEBRIP = re.compile('web-dl|webrip|web-rip|webdl')
+WEBRIP = re.compile('web-dl|webrip|web-rip|webdl|4k\.web')
 DVDRIP = re.compile('dvdrip|dvd-rip|dvd rip')
 
 # Language matcher
@@ -34,6 +34,7 @@ GECKOS = re.compile('geckos')
 MKVCAGE = re.compile('mkvcage')
 ANOXMOUS = re.compile('anoxmous')
 AXXO = re.compile('axxo')
+GANOOL = re.compile('ganool')
 
 
 def get_movie_info_from_dir(dir_name):
@@ -117,6 +118,8 @@ def get_team(name, file):
         team = 'anoXmous'
     elif AXXO.search(name):
         team = 'aXXo'
+    elif GANOOL.search(name):
+        team = 'Ganool'
     else:
         m = PTT_FILE.match(name)
         if m and m.group(3):
