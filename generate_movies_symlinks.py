@@ -24,6 +24,16 @@ def remove_obs_dirs(obs_dirs):
             os.unlink(l)
         os.rmdir(d)
 
+def get_tag(quality, team):
+    ls = quality.split('.')
+    if ls[0] != '2160p':
+        return quality
+
+    if team != 'YIFY' and not team in quality:
+        return "%s.%s" % (quality, team)
+    else:
+        return quality
+
 def generate_symlinks(movies, path, limit=0):
     idx = 0
     current_dirs = set(glob.glob(os.path.join(glob.escape(path), '*')))
@@ -43,7 +53,7 @@ def generate_symlinks(movies, path, limit=0):
         current_links = set(glob.glob(os.path.join(glob.escape(movie_dir), '*')))
         new_links = set()
         for sub_key, video in movie['videos'].items():
-            tag = sub_key
+            tag = get_tag(sub_key, video['team'])
             v_format = video['file'].rsplit('.', 1)[1]
             v_link = os.path.join(movie_dir, "%s - %s.%s" % (name, tag, v_format))
             create_link(video['file'], v_link)

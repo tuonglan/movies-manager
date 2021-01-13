@@ -35,6 +35,8 @@ MKVCAGE = re.compile('mkvcage')
 ANOXMOUS = re.compile('anoxmous')
 AXXO = re.compile('axxo')
 GANOOL = re.compile('ganool')
+TERMINAL = re.compile('terminal')
+LANDO = re.compile('lando')
 
 
 def get_movie_info_from_dir(dir_name):
@@ -110,6 +112,8 @@ def get_team(name, file):
         team = 'RARBG'
     elif SPARKS.search(name):
         team = 'SPARKS'
+    elif TERMINAL.search(name):
+        team = 'TERMiNAL'
     elif GECKOS.search(name):
         team = 'GECKOS'
     elif MKVCAGE.search(name):
@@ -120,6 +124,8 @@ def get_team(name, file):
         team = 'aXXo'
     elif GANOOL.search(name):
         team = 'Ganool'
+    elif LANDO.search(name):
+        team = 'LanDo'
     else:
         m = PTT_FILE.match(name)
         if m and m.group(3):
