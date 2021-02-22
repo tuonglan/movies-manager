@@ -32,7 +32,7 @@ def move_current_movies(movies_db, path, limit, exe=False):
             
             if movies_db[mov_name]['current'] and os.path.isdir(movies_db[mov_name]['current']):
                 if not os.path.isdir(movie_dir) and exe:
-                    os.mkdir(movie_dir)
+                    os.makedirs(movie_dir)
                 files = glob.glob(os.path.join(glob.escape(movies_db[mov_name]['current']), '*'))
                 data['cmds'].setdefault(mov_name, {}).setdefault(mov_quality, [])
                 for f in files:
@@ -78,7 +78,7 @@ def move_new_movies(movies_db, limit, exe=False):
                     data['cmds'][mov_name][mov_quality].append("Move: %s -> %s" % (srt, movies_db[mov_name]['current']))
                 if exe:
                     if not os.path.isdir(movies_db[mov_name]['current']):
-                        os.mkdir(movies_db[mov_name]['current'])
+                        os.makedirs(movies_db[mov_name]['current'])
                     shutil.move(mp4_file, movies_db[mov_name]['current'])
                     for srt in srts:
                         shutil.move(srt, movies_db[mov_name]['current'])

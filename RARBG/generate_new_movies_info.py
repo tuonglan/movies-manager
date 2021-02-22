@@ -75,12 +75,14 @@ def generate_new_movies_db_yts(path):
 
     return movies_db
 
-def compare_movies(new_movies, current_movies):
+def compare_movies(new_movies, movie_dbs):
     no_match = []
     for name, value in new_movies['movies_db'].items():
-        if current_movies.get(name):
-            value['current'] = current_movies[name]
-        else:
+        for db in movie_dbs:
+            if db.get(name):
+                value['current'] = db[name]
+                break
+        if not value['current']:
             no_match.append(name)
 
     new_movies['no_match'] = no_match
@@ -90,7 +92,7 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument('--path', type=str, help='Directory for scanning')
-    parser.add_argument('--current_movies', type=str, default='', help='The current movies file')
+    parser.add_argument('--current_movies', type=str, default='', help='The current movies file, separated by ","')
     parser.add_argument('--out', type=str, default='', help='Output file')
     args = parser.parse_args()
 
@@ -99,9 +101,11 @@ if __name__ == '__main__':
 
     # Read the current movies
     if args.current_movies:
-        with open(args.current_movies) as sin:
-            current_movies_db = json.load(sin)
-            compare_movies(new_movies, current_movies_db['movies_db']['brief'])
+        movie_dbs = []
+        for f in args.current_movies.split(','):
+            with open(os.path.expanduser(f)) as sin:
+                movie_dbs.append(json.load(sin)['movies_db']['brief'])
+        compare_movies(new_movies, movie_dbs)
 
     if args.out:
         with open(args.out, 'w') as fout:
