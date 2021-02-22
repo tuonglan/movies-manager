@@ -94,7 +94,7 @@ def scan_recursive_dir(fulltree, tree, err, stats, path):
         basename = os.path.basename(path)
         m = TOOLS.get_movie_info_from_dir(basename)
         if m:
-            key = "%s.%s" % (m.group(1).lower().replace(' ', '.'), m.group(2))
+            key = m['key']
             if key in fulltree:
                 fulltree[key].setdefault('aux_dirs', []).append(path)
                 fulltree[key]['videos'] = get_videos_info(videos, fulltree[key]['videos'])
@@ -102,8 +102,8 @@ def scan_recursive_dir(fulltree, tree, err, stats, path):
                 fulltree[key] = {
                     'dirname': path,
                     'videos': get_videos_info(videos),
-                    'year': m.group(2),
-                    'title': m.group(1)
+                    'year': m['year'],
+                    'title': m['title']
                 }
                 tree[key] = path
                 

@@ -42,10 +42,19 @@ LANDO = re.compile('lando')
 def get_movie_info_from_dir(dir_name):
     m = PTT_DIR1.match(dir_name)
     if m:
-        return m
+        return {'key': "%s.%s" % (m.group(1).lower().replace(' ', '.'), m.group(2)),
+                'title': m.group(1),
+                'year': m.group(2)
+               }
 
     m = PTT_DIR2.match(dir_name)
-    return m
+    if m:
+        return {'key': "%s.%s" % (m.group(1).lower().replace(' ', '.'), m.group(2)),
+                'title': m.group(1).replace('.', ' ').title(),
+                'year': m.group(2)
+               }
+
+    return None
 
 def get_movie_info_from_file(file_name):
     return PTT_FILE(file_name)
