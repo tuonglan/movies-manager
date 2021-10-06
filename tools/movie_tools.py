@@ -148,5 +148,3 @@ def get_team(name, file):
         #print("==============> %s: %s" % (name, team))
 
     return team
-
-

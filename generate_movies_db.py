@@ -1,7 +1,7 @@
 import os, glob, re, json
 from pprint import pprint
 
-import tools as TOOLS
+from tools import movie_tools as MTOOLS
 
 
 def get_videos_info(videos, current_info={}):
@@ -11,19 +11,19 @@ def get_videos_info(videos, current_info={}):
         name = os.path.basename(v).lower()
 
         # Get codec
-        codec = TOOLS.get_codec(name, v)
+        codec = MTOOLS.get_codec(name, v)
 
         # Get resolution
-        resolution = TOOLS.get_resolution(name, v)
+        resolution = MTOOLS.get_resolution(name, v)
         
         # Get source
-        source = TOOLS.get_source(name, v)
+        source = MTOOLS.get_source(name, v)
 
         # Get team
-        team = TOOLS.get_team(name, v)
+        team = MTOOLS.get_team(name, v)
 
         # Get subtitles
-        subtitles = TOOLS.scan_subtitles_info(v)
+        subtitles = MTOOLS.scan_subtitles_info(v)
 
         # Set key:
         key = "%s.%s" % (resolution, codec)
@@ -61,7 +61,7 @@ def scan_recursive_file(fulltree, tree, err, stats, path):
         scanned = False
         for v in videos:
             video_file_name = os.path.basename(videos[0])
-            m = TOOLS.get_movie_info_from_file(video_file_name)
+            m = MTOOLS.get_movie_info_from_file(video_file_name)
             if m:
                 key = "%s%s" % (m.group(1).lower().replace(' ', '.'), m.group(2))
                 fulltree[key] = {
@@ -92,7 +92,7 @@ def scan_recursive_dir(fulltree, tree, err, stats, path):
     else:
         # Get the film name
         basename = os.path.basename(path)
-        m = TOOLS.get_movie_info_from_dir(basename)
+        m = MTOOLS.get_movie_info_from_dir(basename)
         if m:
             key = m['key']
             if key in fulltree:
