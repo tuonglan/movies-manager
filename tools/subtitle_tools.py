@@ -1,4 +1,4 @@
-import requests, io, os, shutil
+import requests, io, os, shutil, cloudscraper
 import zipfile, rarfile
 
 SUPPORTED_EXT=['srt', 'ass']
@@ -16,6 +16,19 @@ def _create_request(link):
         ses = requests.Session()
         ses.trust_env = False
         req = ses.get(link)
+
+    if req.status_code != 200:
+        print("\tUsing cloudscraper library...")
+        while True:
+            scraper = cloudscraper.create_scraper()
+            req = scraper.get(link)
+            if req.status_code == 200:
+                break
+            else:
+                text = input("\t\tFailed to scrape the subtitles, press Enter ONLY to try again, other to exit:")
+                if text != '':
+                    break
+
     if req.status_code != 200:
         raise Exception("Can't download !! Code %s, msg: %s" % (req.status_code, req.text))
 
