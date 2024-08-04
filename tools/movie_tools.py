@@ -36,20 +36,21 @@ ANOXMOUS = re.compile('anoxmous')
 AXXO = re.compile('axxo')
 GANOOL = re.compile('ganool')
 TERMINAL = re.compile('terminal')
+QXR = re.compile('qxr|tigole')
 LANDO = re.compile('lando')
 
 
 def get_movie_info_from_dir(dir_name):
     m = PTT_DIR1.match(dir_name)
     if m:
-        return {'key': "%s.%s" % (m.group(1).lower().replace(' ', '.'), m.group(2)),
+        return {'key': "%s.%s" % (m.group(1).lower().replace(' ', '.').replace('-.', ''), m.group(2)),
                 'title': m.group(1),
                 'year': m.group(2)
                }
 
     m = PTT_DIR2.match(dir_name)
     if m:
-        return {'key': "%s.%s" % (m.group(1).lower().replace(' ', '.'), m.group(2)),
+        return {'key': "%s.%s" % (m.group(1).lower().replace(' ', '.').replace('-.', ''), m.group(2)),
                 'title': m.group(1).replace('.', ' ').title(),
                 'year': m.group(2)
                }
@@ -133,6 +134,8 @@ def get_team(name, file):
         team = 'aXXo'
     elif GANOOL.search(name):
         team = 'Ganool'
+    elif QXR.search(name):
+        team = 'QxR'
     elif LANDO.search(name):
         team = 'LanDo'
     else:

@@ -27,7 +27,7 @@ def get_videos_info(videos, current_info={}):
 
         # Set key:
         key = "%s.%s" % (resolution, codec)
-        if key in info:
+        if key in info or resolution == "2160p":
             key = "%s.%s" % (key, team)
             if key in info:
                 key = "%s.%s" % (key, key_idx)
